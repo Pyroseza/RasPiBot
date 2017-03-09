@@ -74,8 +74,21 @@ def GenMotorControl(LeftDirection, LeftSpeed, RightDirection, RightSpeed, waitTi
     else:
         pwmMotorRightForwards.ChangeDutyCycle(DutyCycleStop)
         pwmMotorRightBackwards.ChangeDutyCycle(DutyCycleStop)
+    #GenMotorControlSafetyNet(pwmLeftMotorForwards, pwmLeftMotorBackwards, LeftDirection, LeftSpeed)
+    #GenMotorControlSafetyNet(pwmRightMotorForwards, pwmRightMotorBackwards, RightDirection, RightSpeed)
     #time to wait after issuing motor commands
     time.sleep(waitTime)
+
+def GenMotorControlSafetyNet(pwmMotorForwards, pwmMotorBackwards, Direction, Speed):
+    if Direction == "Forwards":
+        pwmMotorForwards.ChangeDutyCycle(Speed)
+        pwmMotorBackwards.ChangeDutyCycle(DutyCycleStop)
+    elif Direction == "Backwards":
+        pwmMotorForwards.ChangeDutyCycle(DutyCycleStop)
+        pwmMotorBackwards.ChangeDutyCycle(Speed)
+    else:
+        pwmMotorForwards.ChangeDutyCycle(DutyCycleStop)
+        pwmMotorBackwards.ChangeDutyCycle(DutyCycleStop)
 
 # Turn all motors off
 def StopAll():
