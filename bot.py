@@ -9,114 +9,138 @@ import Tkinter as tk
 
 # Set the GPIO modes
 GPIO.setmode(GPIO.BCM)
-GPIO.setwarnings(False)
+#GPIO.setwarnings(False)
 
 # Set variables for the GPIO motor pins
-#right motors
-pinMotorAForwards = 7
-pinMotorABackwards = 8
 #left motors
-pinMotorBForwards = 10 
-pinMotorBBackwards = 9
+pinMotorLeftForwards = 7
+pinMotorLeftBackwards = 8
+#right motors
+pinMotorRightForwards =  9
+pinMotorRightBackwards = 10
 
 # How many times to turn the pin on and off each second
-Frequency = 20
+Frequency = 60
 # How long the pin stays on each cycle, as a percent
-DutyCycleA = 90.0
-DutyCycleB = 50.0
+DutyCycleHigh = 90.0
+DutyCycleLow = 60.0
 # Settng the duty cycle to 0 means the motors will not turn
-Stop = 0.0
+DutyCycleStop = 0.0
+
+#Keywords
+Fwd="Forwards"
+Bwd="Backwards"
+Stp="Stop"
 
 # Set the GPIO Pin mode to be Output
-GPIO.setup(pinMotorAForwards, GPIO.OUT)
-GPIO.setup(pinMotorABackwards, GPIO.OUT)
-GPIO.setup(pinMotorBForwards, GPIO.OUT)
-GPIO.setup(pinMotorBBackwards, GPIO.OUT)
+GPIO.setup(pinMotorLeftForwards, GPIO.OUT)
+GPIO.setup(pinMotorLeftBackwards, GPIO.OUT)
+GPIO.setup(pinMotorRightForwards, GPIO.OUT)
+GPIO.setup(pinMotorRightBackwards, GPIO.OUT)
 
 # Set the GPIO to software PWM at 'Frequency' Hertz
-pwmMotorAForwards = GPIO.PWM(pinMotorAForwards, Frequency)
-pwmMotorABackwards = GPIO.PWM(pinMotorABackwards, Frequency)
-pwmMotorBForwards = GPIO.PWM(pinMotorBForwards, Frequency)
-pwmMotorBBackwards = GPIO.PWM(pinMotorBBackwards, Frequency)
+pwmMotorLeftForwards = GPIO.PWM(pinMotorLeftForwards, Frequency)
+pwmMotorLeftBackwards = GPIO.PWM(pinMotorLeftBackwards, Frequency)
+pwmMotorRightForwards = GPIO.PWM(pinMotorRightForwards, Frequency)
+pwmMotorRightBackwards = GPIO.PWM(pinMotorRightBackwards, Frequency)
 
 # Start the software PWM with a duty cycle of 0 (i.e. not moving)
-pwmMotorAForwards.start(Stop)
-pwmMotorABackwards.start(Stop)
-pwmMotorBForwards.start(Stop)
-pwmMotorBBackwards.start(Stop)
+pwmMotorLeftForwards.start(DutyCycleStop)
+pwmMotorLeftBackwards.start(DutyCycleStop)
+pwmMotorRightForwards.start(DutyCycleStop)
+pwmMotorRightBackwards.start(DutyCycleStop)
 
 #Generic motor control
-def GenMotorControl(AForward, ABackword, BForward, BBackword, waitTime):
-    pwmMotorAForwards.ChangeDutyCycle(AForward)
-    pwmMotorABackwards.ChangeDutyCycle(ABackword)
-    pwmMotorBForwards.ChangeDutyCycle(BForward)
-    pwmMotorBBackwards.ChangeDutyCycle(BBackword)
+def GenMotorControl(LeftDirection, LeftSpeed, RightDirection, RightSpeed, waitTime):
+    #Left motors
+    print("Left motor: ", LeftDirection, ", speed: ", LeftSpeed) 
+    if LeftDirection == "Forwards":
+        pwmMotorLeftForwards.ChangeDutyCycle(LeftSpeed)
+        pwmMotorLeftBackwards.ChangeDutyCycle(DutyCycleStop)
+    elif LeftDirection == "Backwards":
+        pwmMotorLeftForwards.ChangeDutyCycle(DutyCycleStop)
+        pwmMotorLeftBackwards.ChangeDutyCycle(LeftSpeed)
+    else:
+        pwmMotorLeftForwards.ChangeDutyCycle(DutyCycleStop)
+        pwmMotorLeftBackwards.ChangeDutyCycle(DutyCycleStop)
+    #Right motors
+    print("Right motor: ", RightDirection, ", speed: ", RightSpeed) 
+    if RightDirection == "Forwards":
+        pwmMotorRightForwards.ChangeDutyCycle(RightSpeed)
+        pwmMotorRightBackwards.ChangeDutyCycle(DutyCycleStop)
+    elif RightDirection == "Backwards":
+        pwmMotorRightForwards.ChangeDutyCycle(DutyCycleStop)
+        pwmMotorRightBackwards.ChangeDutyCycle(RightSpeed)
+    else:
+        pwmMotorRightForwards.ChangeDutyCycle(DutyCycleStop)
+        pwmMotorRightBackwards.ChangeDutyCycle(DutyCycleStop)
+    #time to wait after issuing motor commands
     time.sleep(waitTime)
 
 # Turn all motors off
 def StopAll():
     print("Stopping motors!")
-    GenMotorControl(Stop, Stop, Stop, Stop, 0)
+    GenMotorControl(Stp, DutyCycleStop, Stp, DutyCycleStop, 0)
 
 # Turn both motors forwards
 def Forwards(t):
     print("Forwards")
-    GenMotorControl(DutyCycleA, Stop, DutyCycleA, Stop, t)
+    GenMotorControl(Fwd, DutyCycleHigh, Fwd, DutyCycleHigh, t)
 
 # Turn both motors backwards
 def Backwards(t):
     print("Backwards")
-    GenMotorControl(Stop, DutyCycleA, Stop, DutyCycleA, t)
+    GenMotorControl(Bwd, DutyCycleHigh, Bwd, DutyCycleHigh, t)
 
 # Turn Left going forward
-def Left(t):
+def LeftForwards(t):
     print("Left Forwards")
-    GenMotorControl(DutyCycleA, Stop, DutyCycleB, Stop, t)
+    GenMotorControl(Fwd, DutyCycleLow, Fwd, DutyCycleHigh, t)
 
 #Turn Left going backword 
-def LeftB(t):
+def LeftBackwards(t):
     print("Left Backwards")
-    GenMotorControl(Stop, DutyCycleA, Stop, DutyCycleB, t)
+    GenMotorControl(Bwd, DutyCycleLow, Bwd, DutyCycleHigh, t)
 
 # Turn Right going forward
-def Right(t):
+def RightForwards(t):
     print("Right Forwards")
-    GenMotorControl(DutyCycleB, Stop, DutyCycleA, Stop, t)
+    GenMotorControl(Fwd, DutyCycleHigh, Fwd, DutyCycleLow, t)
 
-# Turn Right going backword
-def RightB(t):
+# Turn Right going backward
+def RightBackwards(t):
     print("Right Backwards")
-    GenMotorControl(Stop, DutyCycleB, Stop, DutyCycleA, t)
+    GenMotorControl(Bwd, DutyCycleHigh, Bwd, DutyCycleLow, t)
     
 # Pivot Left
-def Pivot_Left(t):
+def PivotLeft(t):
     print("Pivot Left")
-    GenMotorControl(DutyCycleA, Stop, Stop, DutyCycleA, t)
+    GenMotorControl(Bwd, DutyCycleHigh, Fwd, DutyCycleHigh, t)
 
 # Pivot Right
-def Pivot_Right(t):
+def PivotRight(t):
     print("Pivot Right")
-    GenMotorControl(Stop, DutyCycleA, DutyCycleA, Stop, t)
+    GenMotorControl(Fwd, DutyCycleHigh, Bwd, DutyCycleHigh, t)
 
 # Left only Forward
-def LeftOnlyForward(t):
+def LeftOnlyForwards(t):
     print("Left Only Forward")
-    GenMotorControl(DutyCycleA, Stop, Stop, Stop, t)
+    GenMotorControl(Fwd, DutyCycleHigh, Stp, DutyCycleStop, t)
 
 # Right Only Forward
-def RightOnlyForward(t):
+def RightOnlyForwards(t):
     print("Right Only Forward")
-    GenMotorControl(Stop, Stop, DutyCycleA, Stop, t)
+    GenMotorControl(Stp, DutyCycleStop, Fwd, DutyCycleHigh, t)
 
 # Left only Backward
-def LeftOnlyBackward(t):
+def LeftOnlyBackwards(t):
     print("Left Only Backward")
-    GenMotorControl(Stop, DutyCycleA, Stop, Stop, t)
+    GenMotorControl(Bwd, DutyCycleHigh, Stp, DutyCycleStop, t)
 
 # Right Only Backward
-def RightOnlyBackward(t):
+def RightOnlyBackwards(t):
     print("Right Only Backward")
-    GenMotorControl(Stop, Stop, Stop, DutyCycleA, t)
+    GenMotorControl(Stp, DutyCycleStop, Bwd, DutyCycleHigh, t)
 
 # Exit the script cleanly
 def ExitCleanly():
@@ -129,43 +153,65 @@ def ExitCleanly():
 
 # Your code to control the robot goes below this line
 def Demo():
-    RightOnlyForward(3) 
-    StopAll()
-    LeftOnlyForward(3)
-    StopAll()
-    RightOnlyBackward(3) 
-    StopAll()
-    LeftOnlyBackward(3)
+    key_control("W",1)
+    key_control("A",1)
+    key_control("D",1)
+    key_control("X",0.3)
+    key_control("E",1)
+    key_control("W",1)
+    key_control("Z",1)
+    key_control("W",1)
+    key_control("Q",3)
     ExitCleanly()
 
-#Command centre, input key from keyboard, appropriate action performed
-def command_centre(char):
-    slptm = 0.05
+def printUsage():
+    print("Enter a key followed by enter")
+    print("W = Forwards")
+    print("A = Left Forwards")
+    print("S = Backwards")
+    print("D = Right Forwards")
+    print("Q = Pivot Left")
+    print("P = Pivot Right")
+    print("Z = Left Backwards")
+    print("X = Stop")
+    print("C = Right Backwards")
+    print("H = Left Forwardsa Only")
+    print("J = Left Backwards Only")
+    print("K = Right Forwards Only")
+    print("L = Right Backwards Only")
+    print("\n")
+    print("P = Demo")
+    print("M = Exit")
+    print("\n")
+
+
+#input key from keyboard, appropriate action performed
+def key_control(char, slptm):
     print "Key: ", char
     if char == 'W':
         Forwards(slptm)
     elif char == 'S':
         Backwards(slptm)
     elif char == 'A':
-        Left(slptm)
-    elif char == 'Z':
-        LeftB(slptm)
-    elif char == 'C':
-        RightB(slptm)
+        LeftForwards(slptm)
     elif char == 'D':
-        Right(slptm)
+        RightForwards(slptm)
+    elif char == 'Z':
+        LeftBackwards(slptm)
+    elif char == 'C':
+        RightBackwards(slptm)
     elif char == 'Q':
-        Pivot_Left(slptm)
+        PivotLeft(slptm)
     elif char == 'E':
-        Pivot_Right(slptm)
+        PivotRight(slptm)
     elif char == 'H':
-        LeftOnlyBackward(slptm)
+        LeftOnlyBackwards(slptm)
     elif char == 'J':
-        LeftOnlyForward(slptm)
+        LeftOnlyForwards(slptm)
     elif char == 'K':
-        RightOnlyForward(slptm)
+        RightOnlyForwards(slptm)
     elif char == 'L':
-        RightOnlyBackward(slptm)
+        RightOnlyBackwards(slptm)
     elif char == 'X':
         StopAll()
     elif char == 'P':
@@ -178,12 +224,14 @@ def command_centre(char):
 
 def main():
     #command = tk.Tk()
-    #command.bind('<KeyPress>', key_input)
+    #command.bind('<KeyPress>', key_control)
     #command.mainloop()
+    slptm=0.05
+    printUsage()
     while True:
        try:
            input = raw_input("")
-           command_centre(input.upper())
+           key_control(input.upper(), slptm)
        except KeyboardInterrupt:
            ExitCleanly()
        except SystemExit:
@@ -194,7 +242,7 @@ def main():
            print("Unexpected error:", sys.exc_info()[0])
            raise
        else:
-          time.sleep(0.05)
+          time.sleep(slptm)
 
 if __name__ == "__main__":
     main()
