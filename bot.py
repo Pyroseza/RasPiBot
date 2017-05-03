@@ -184,7 +184,7 @@ def printUsage():
     print("S = Backwards")
     print("D = Right Forwards")
     print("Q = Pivot Left")
-    print("P = Pivot Right")
+    print("E = Pivot Right")
     print("Z = Left Backwards")
     print("X = Stop")
     print("C = Right Backwards")
