@@ -3,6 +3,7 @@
 # use any available joystick, use the new function in 1.0.6 of approxeng.input to get multiple
 # axis values in a single call, use implicit de-structuring of tuples to reduce verbosity, add
 # an exception to break out of the control loop on pressing HOME etc.
+# Modified by Jarrod Price: made it work with the gpiozero Robot lib, nice and comfy with no errors so far
 
 from time import sleep
 
@@ -28,12 +29,13 @@ try:
             Power to send to right motor, will be inverted to reflect chassis layout
         """
 	power_right = float(abs(power_right) / 100)
-	#if power_right <> 0:
-	print(str(power_right))
+
+	if power_right <> 0.0:
+		print(str(power_right))
 
 	power_left = float(abs(power_left) / 100)
-	#if power_left <> 0: 
-	print(str(power_left))
+	if power_left <> 0.0: 
+		print(str(power_left))
 
 	robot.value = (power_left, power_right)
 
