@@ -65,4 +65,4 @@ while True:
             GPIO.output(PINBUZZER, GPIO.HIGH)
         time.sleep(1)
     except:
-      GPIO.cleanup()
+        GPIO.cleanup()
