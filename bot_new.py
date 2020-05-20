@@ -17,8 +17,7 @@ try:
     
     from gpiozero import Robot
     robot = Robot(left=(7,8), right=(9,10))
-
-    print('GPIO zero library available.')
+    print('GPIO zero library available, connected to pins: 7,8, 9 & 10')
 
 
     def set_speeds(power_left, power_right):
@@ -28,35 +27,34 @@ try:
         :param power_right: 
             Power to send to right motor, will be inverted to reflect chassis layout
         """
-	if power_right <> 0:
+	if power_right != 0:
 		print("right: " + str(power_right))
 	#power_right = float(power_right / 100)
 	power_right = (power_right / 100.0)
-	if power_right <> 0.0:
+	if power_right != 0.0:
 		print("right: " + str(power_right))
-	if power_left <> 0:
+	if power_left != 0:
 		print("left: " + str(power_left))
 	#power_left = float(power_left / 100)
 	power_left = (power_left / 100.0)
-	if power_left <> 0.0: 
+	if power_left != 0.0: 
 		print("left: " + str(power_left))
 
 	robot.value = (power_left, power_right)
 
     def stop_motors():
         """
-        As we have an motor hat, stop the motors using their motors call
+        As we have conencted to the gpiozero lib, stop the motors using their stop function
         """
         robot.stop()
 
 except ImportError:
 
-    print('No explorer HAT library available, using dummy functions.')
-
+    print('No gpiozero library available, using dummy functions.')
 
     def set_speeds(power_left, power_right):
         """
-        No motor hat - print what we would have sent to it if we'd had one.
+        No gpiozero library - print what we would have sent to it if we'd had one.
         """
         print('Left: {}, Right: {}'.format(power_left, power_right))
         sleep(0.1)
@@ -64,7 +62,7 @@ except ImportError:
 
     def stop_motors():
         """
-        No motor hat, so just print a message.
+        No gpiozero library, so just print a message.
         """
         print('Motors stopping')
 
