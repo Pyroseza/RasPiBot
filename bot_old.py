@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: ascii -*-
-# - Jarrod's RasPi Robotics Library
+# - Simple RasPi Robotics Library
 
 import RPi.GPIO as GPIO # Import the GPIO Library
 import time # Import the Time library
